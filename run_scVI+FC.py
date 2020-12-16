@@ -7,24 +7,7 @@ from scvi.core.trainers import SemiSupervisedTrainer
 import time as tm
 import rpy2.robjects as robjects
 
-def run_scVI_FC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
-    '''
-    run scVI
-    Wrapper script to run scVI on a benchmark dataset with 5-fold cross validation,
-    outputs lists of true and predicted cell labels as csv files, as well as computation time.
-  
-    Parameters
-    ----------
-    DataPath : Data file path (.csv), cells-genes matrix with cell unique barcodes 
-    as row names and gene names as column names.
-    LabelsPath : Cell population annotations file path (.csv).
-    CV_RDataPath : Cross validation RData file path (.RData), obtained from Cross_Validation.R function.
-    OutputDir : Output directory defining the path of the exported file.
-    GeneOrderPath : Gene order file path (.csv) obtained from feature selection, 
-    defining the genes order for each cross validation fold, default is NULL.
-    NumGenes : Number of genes used in case of feature selection (integer), default is 0.
-    '''
-    
+def run_scVI_FC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):   
     # read the Rdata file
     robjects.r['load'](CV_RDataPath)
 

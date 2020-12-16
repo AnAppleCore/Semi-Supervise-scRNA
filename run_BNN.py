@@ -1,4 +1,14 @@
-import os 
+import argparse
+
+parser = argparse.ArgumentParser()
+# choose the GPU id (0,1,2,3)
+parser.add_argument('-d', '--device_index', type = str, default = '1')
+opt = parser.parse_args()
+
+import os
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = opt.device_index
+
 import numpy as np
 import pandas as pd
 import time as tm
@@ -12,9 +22,9 @@ import torch.optim as optim
 from torch.distributions import Normal
 
 
-class Linear_BBB(nn.Module):
+class BayesLinear(nn.Module):
     """
-        Layer of BNN.
+        Bayes Linear layer
         Using backpropagation.
     """
     def __init__(self, input_features, output_features, prior_var=1.):
@@ -51,11 +61,11 @@ class Linear_BBB(nn.Module):
           Optimization process
         """
         # sample weights
-        w_epsilon = Normal(0,1).sample(self.w_mu.shape)
+        w_epsilon = Normal(0,1).sample(self.w_mu.shape)#.cuda()
         self.w = self.w_mu + torch.log(1+torch.exp(self.w_rho)) * w_epsilon
 
         # sample bias
-        b_epsilon = Normal(0,1).sample(self.b_mu.shape)
+        b_epsilon = Normal(0,1).sample(self.b_mu.shape)#.cuda()
         self.b = self.b_mu + torch.log(1+torch.exp(self.b_rho)) * b_epsilon
 
         # record log prior by evaluating log pdf of prior at sampled weight and bias
@@ -76,8 +86,8 @@ class BNN(nn.Module):
 
         # initialize the network like you would with a standard multilayer perceptron, but using the BBB layer
         super().__init__()
-        self.hidden = Linear_BBB(input_features,hidden_units, prior_var=prior_var)
-        self.out = Linear_BBB(hidden_units, output_features, prior_var=prior_var)
+        self.hidden = BayesLinear(input_features,hidden_units, prior_var=prior_var)
+        self.out = BayesLinear(hidden_units, output_features, prior_var=prior_var)
         self.noise_tol = noise_tol # we will use the noise tolerance to calculate our likelihood
         self.input_features = input_features
         self.output_features = output_features
@@ -122,19 +132,7 @@ class BNN(nn.Module):
 def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
     '''
     run baseline classifier: BNN
-    Wrapper script to run an BNN classifier with a linear kernel on a benchmark dataset with 5-fold cross validation,
-    outputs lists of true and predicted cell labels as csv files, as well as computation time.
-  
-    Parameters
-    ----------
-    DataPath : Data file path (.csv), cells-genes matrix with cell unique barcodes 
-    as row names and gene names as column names.
-    LabelsPath : Cell population annotations file path (.csv).
-    CV_RDataPath : Cross validation RData file path (.RData), obtained from Cross_Validation.R function.
-    OutputDir : Output directory defining the path of the exported file.
-    GeneOrderPath : Gene order file path (.csv) obtained from feature selection, 
-    defining the genes order for each cross validation fold, default is NULL.
-    NumGenes : Number of genes used in case of feature selection (integer), default is 0.
+    Train on the target dataset
     '''
         
     # read the Rdata file
@@ -153,8 +151,8 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
     
     labels = labels.iloc[tokeep]
     data = data.iloc[tokeep]
-    print(labels.shape)
-    print(data.shape)
+    print('Labels shape:', labels.shape)
+    print('Data shape:', data.shape)
     
     # read the feature file
     if (NumGenes > 0):
@@ -167,23 +165,22 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
     data = np.log1p(data)
     X = np.array(data)
     X = torch.Tensor(X)
-    print(X.shape)
-    print(len(X[0]))
+    # print(X.shape)
+    # print(len(X[0]))
 
     # preprocess the data
     unique = np.unique(labels)
-    print(unique)
+    print('Classes:', unique)
     Y = np.zeros([len(labels), len(unique)], int)
     for j in range(len(unique)):
         Y[np.where(labels == unique[j])[0], j] = 1
     Y = torch.Tensor(Y)
-    print(Y.shape)
-    print(len(Y[0]))
-    # print(len(unique))
+    # print(Y.shape)
+    # print(len(Y[0]))
 
     # set the classifier
-    Classifier = BNN(len(X[0]), 1024, len(Y[0]), prior_var=10.)
-    optimizer = optim.Adam(Classifier.parameters(), lr=.1)
+    Classifier = BNN(len(X[0]), 1024, len(Y[0]), prior_var=10.) #.cuda()
+    optimizer = optim.Adam(Classifier.parameters(), lr=1e-3)
             
     tr_time=[]
     ts_time=[]
@@ -195,9 +192,9 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
         test_ind_i = np.array(test_ind[i], dtype = 'int') - 1
         train_ind_i = np.array(train_ind[i], dtype = 'int') - 1
 
-        x_train = X[train_ind_i]
-        x_test = X[test_ind_i]
-        y_train = Y[train_ind_i]
+        x_train = X[train_ind_i]#.cuda()
+        x_test = X[test_ind_i]#.cuda()
+        y_train = Y[train_ind_i]#.cuda()
         y_test = Y[test_ind_i]
             
         if (NumGenes > 0):
@@ -206,9 +203,7 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
             x_test = x_test[:,feat_to_use]
         
         print('Fold:', i)
-        # print('\t', test_ind_i)
         print('\t', len(test_ind_i))
-        # print('\t', train_ind_i)
         print('\t', len(train_ind_i))
         print('\tx_train.shape: ', x_train.shape)
         print('\tx_test.shape: ', x_test.shape)
@@ -217,12 +212,10 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
 
 
         start=tm.time()
-        # print('Fold:', i)
         epochs = 20
-        # batch_size = 512
         for epoch in range(epochs):
+            loss = Classifier.sample_elbo(x_train, y_train, 100)
             optimizer.zero_grad()
-            loss = Classifier.sample_elbo(x_train, y_train, 1)
             loss.backward()
             optimizer.step()
             if (epoch+1) % 10 == 0:
@@ -231,8 +224,8 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
         tr_time.append(tm.time()-start)
                     
         start=tm.time()
-        y_pred = Classifier(x_test).detach().numpy()
-        print('\ty_pred.shape: ', y_pred.shape)
+        y_pred = Classifier(x_test).detach().cpu().numpy()
+        # print('\ty_pred.shape: ', y_pred.shape)
         ts_time.append(tm.time()-start)
     
         for i in range(len(test_ind_i)):
@@ -259,5 +252,20 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
         tr_time.to_csv("BNN_" + str(NumGenes) + "_Training_Time.csv", index = False)
         ts_time.to_csv("BNN_" + str(NumGenes) + "_Testing_Time.csv", index = False)
 
+if torch.cuda.is_available():
+    print('The code uses GPU ', opt.device_index)
     
 run_BNN('./datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','./datasets/Pancreatic_data/Baron Human/Labels.csv','./datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Baron Human/')
+
+class BNN_2(nn.Module):
+
+    def __init__(self, input_size, hidden_size, output_size):
+        super(BNN_2, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        output = self.fc1(x)
+        output = F.relu(output)
+        output = self.fc2(x)
+        return output
