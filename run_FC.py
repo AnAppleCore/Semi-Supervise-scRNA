@@ -167,4 +167,4 @@ def run_FC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", Nu
 if torch.cuda.is_available():
     print('The code uses GPU ', opt.device_index)
 
-run_FC('./datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','./datasets/Pancreatic_data/Baron Human/Labels.csv','./datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Baron Human/')
+run_FC('../scRNA_datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','../scRNA_datasets/Pancreatic_data/Baron Human/Labels.csv','../scRNA_datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Pancreatic_data/Baron Human/FC/')

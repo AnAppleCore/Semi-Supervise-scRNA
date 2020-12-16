@@ -105,5 +105,5 @@ def run_scVI_FC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "
         tr_time.to_csv("scVI_" + str(NumGenes) + "_Training_Time.csv", index = False)
         ts_time.to_csv("scVI_" + str(NumGenes) + "_Testing_Time.csv", index = False)
         
-run_scVI_FC('./datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','./datasets/Pancreatic_data/Baron Human/Labels.csv','./datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Baron Human/')
+run_scVI_FC('../scRNA_datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','../scRNA_datasets/Pancreatic_data/Baron Human/Labels.csv','../scRNA_datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Pancreatic_data/Baron Human/scVI_FC/')
 

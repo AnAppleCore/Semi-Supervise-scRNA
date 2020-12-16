@@ -101,6 +101,6 @@ def run_SVM(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
         ts_time.to_csv("SVM_" + str(NumGenes) + "_Testing_Time.csv", index = False)
 
     
-run_SVM('./datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','./datasets/Pancreatic_data/Baron Human/Labels.csv','./datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Baron Human/')
+run_SVM('../scRNA_datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','../scRNA_datasets/Pancreatic_data/Baron Human/Labels.csv','../scRNA_datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Pancreatic_data/Baron Human/SVM/')
 
 

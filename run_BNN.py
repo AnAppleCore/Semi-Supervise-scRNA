@@ -255,7 +255,7 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
 if torch.cuda.is_available():
     print('The code uses GPU ', opt.device_index)
     
-run_BNN('./datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','./datasets/Pancreatic_data/Baron Human/Labels.csv','./datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Baron Human/')
+run_BNN('../scRNA_datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','../scRNA_datasets/Pancreatic_data/Baron Human/Labels.csv','../scRNA_datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Pancreatic_data/Baron Human/BNN/')
 
 class BNN_2(nn.Module):
 
