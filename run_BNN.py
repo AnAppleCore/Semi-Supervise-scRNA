@@ -61,11 +61,11 @@ class BayesLinear(nn.Module):
           Optimization process
         """
         # sample weights
-        w_epsilon = Normal(0,1).sample(self.w_mu.shape)#.cuda()
+        w_epsilon = Normal(0,1).sample(self.w_mu.shape).cuda()
         self.w = self.w_mu + torch.log(1+torch.exp(self.w_rho)) * w_epsilon
 
         # sample bias
-        b_epsilon = Normal(0,1).sample(self.b_mu.shape)#.cuda()
+        b_epsilon = Normal(0,1).sample(self.b_mu.shape).cuda()
         self.b = self.b_mu + torch.log(1+torch.exp(self.b_rho)) * b_epsilon
 
         # record log prior by evaluating log pdf of prior at sampled weight and bias
@@ -110,7 +110,7 @@ class BNN(nn.Module):
         # we calculate the negative elbo, which will be our loss function
         #initialize tensors
         # samples is the number of "predictions" we make for 1 x-value.
-        outputs = torch.zeros(samples, target.shape[0], target.shape[1])
+        outputs = torch.zeros(samples, target.shape[0], target.shape[1]).cuda()
         log_priors = torch.zeros(samples)
         log_posts = torch.zeros(samples)
         log_likes = torch.zeros(samples)
@@ -179,8 +179,8 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
     # print(len(Y[0]))
 
     # set the classifier
-    Classifier = BNN(len(X[0]), 1024, len(Y[0]), prior_var=10.) #.cuda()
-    optimizer = optim.Adam(Classifier.parameters(), lr=1e-3)
+    Classifier = BNN(len(X[0]), 1024, len(Y[0]), prior_var=1.) .cuda()
+    optimizer = optim.Adam(Classifier.parameters(), lr=0.1)
             
     tr_time=[]
     ts_time=[]
@@ -192,9 +192,9 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
         test_ind_i = np.array(test_ind[i], dtype = 'int') - 1
         train_ind_i = np.array(train_ind[i], dtype = 'int') - 1
 
-        x_train = X[train_ind_i]#.cuda()
-        x_test = X[test_ind_i]#.cuda()
-        y_train = Y[train_ind_i]#.cuda()
+        x_train = X[train_ind_i].cuda()
+        x_test = X[test_ind_i].cuda()
+        y_train = Y[train_ind_i].cuda()
         y_test = Y[test_ind_i]
             
         if (NumGenes > 0):
@@ -212,9 +212,9 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
 
 
         start=tm.time()
-        epochs = 20
+        epochs = 100
         for epoch in range(epochs):
-            loss = Classifier.sample_elbo(x_train, y_train, 100)
+            loss = Classifier.sample_elbo(x_train, y_train, 10)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
