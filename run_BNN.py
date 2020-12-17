@@ -256,16 +256,3 @@ if torch.cuda.is_available():
     print('The code uses GPU ', opt.device_index)
     
 run_BNN('../scRNA_datasets/Pancreatic_data/Baron Human/Filtered_Baron_HumanPancreas_data.csv','../scRNA_datasets/Pancreatic_data/Baron Human/Labels.csv','../scRNA_datasets/Pancreatic_data/Baron Human/CV_folds.RData','./Results/Pancreatic_data/Baron Human/BNN/')
-
-class BNN_2(nn.Module):
-
-    def __init__(self, input_size, hidden_size, output_size):
-        super(BNN_2, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.fc2 = nn.Linear(hidden_size, output_size)
-
-    def forward(self, x):
-        output = self.fc1(x)
-        output = F.relu(output)
-        output = self.fc2(x)
-        return output
