@@ -114,12 +114,12 @@ def run_FC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", Nu
             x_test = x_test[:,feat_to_use]
         
         print('Fold:', i)
-        print('\t', len(test_ind_i))
-        print('\t', len(train_ind_i))
-        print('\tx_train.shape: ', x_train.shape)
-        print('\tx_test.shape: ', x_test.shape)
-        print('\ty_train.shape: ', y_train.shape)
-        print('\ty_test.shape: ', y_test.shape, '\n')
+        print('\tTest #:', len(test_ind_i))
+        print('\tTrain #:', len(train_ind_i), '\n')
+        # print('\tx_train.shape: ', x_train.shape)
+        # print('\tx_test.shape: ', x_test.shape)
+        # print('\ty_train.shape: ', y_train.shape)
+        # print('\ty_test.shape: ', y_test.shape, '\n')
 
 
         start=tm.time()
@@ -132,7 +132,7 @@ def run_FC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", Nu
             optimizer.step()
             if (epoch+1) % 10 == 0:
                 print('\tepoch: {}/{}'.format(epoch+1, epochs))
-                print('\tLoss: ', loss.item(), '\n')
+                print('\tLoss: %.3f\n'% loss.item())
         tr_time.append(tm.time()-start)
                     
         start=tm.time()

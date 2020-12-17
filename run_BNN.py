@@ -203,12 +203,12 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
             x_test = x_test[:,feat_to_use]
         
         print('Fold:', i)
-        print('\t', len(test_ind_i))
-        print('\t', len(train_ind_i))
-        print('\tx_train.shape: ', x_train.shape)
-        print('\tx_test.shape: ', x_test.shape)
-        print('\ty_train.shape: ', y_train.shape)
-        print('\ty_test.shape: ', y_test.shape, '\n')
+        print('\tTest #:', len(test_ind_i))
+        print('\tTrain #:', len(train_ind_i), '\n')
+        # print('\tx_train.shape: ', x_train.shape)
+        # print('\tx_test.shape: ', x_test.shape)
+        # print('\ty_train.shape: ', y_train.shape)
+        # print('\ty_test.shape: ', y_test.shape, '\n')
 
 
         start=tm.time()
