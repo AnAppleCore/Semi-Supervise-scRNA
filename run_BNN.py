@@ -34,10 +34,8 @@ class BayesLinear(nn.Module):
             prior is a normal distribution centered in 0 and of variance 1.
             standard normal distribution
         """
-        # initialize layers
         super().__init__()
 
-        # set input and output dimensions
         self.input_features = input_features
         self.output_features = output_features
 
@@ -49,7 +47,7 @@ class BayesLinear(nn.Module):
         self.b_mu =  nn.Parameter(torch.zeros(output_features))
         self.b_rho = nn.Parameter(torch.zeros(output_features))        
 
-        #initialize weight samples (these will be calculated whenever the layer makes a prediction)
+        #initialize weight samples, calculated whenever the layer makes a prediction
         self.w = None
         self.b = None
 
