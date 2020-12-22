@@ -5,6 +5,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--device_index', type = str, default = '1')
 parser.add_argument('-p', '--prior_var', type = float, default = 1.)
 parser.add_argument('-s', '--samples', type = int, default = 10)
+parser.add_argument('-r', '--learning_rate', type = float, default = 1e-3)
 opt = parser.parse_args()
 
 import os
@@ -179,8 +180,8 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
     # print(len(Y[0]))
 
     # set the classifier
-    Classifier = BNN(len(X[0]), 1024, len(Y[0]), prior_var=1.) .cuda()
-    optimizer = optim.Adam(Classifier.parameters(), lr=0.1)
+    Classifier = BNN(len(X[0]), 1024, len(Y[0]), prior_var=opt.prior_var) .cuda()
+    optimizer = optim.Adam(Classifier.parameters(), lr=opt.learning_rate)
             
     tr_time=[]
     ts_time=[]
@@ -214,7 +215,7 @@ def run_BNN(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
         start=tm.time()
         epochs = 100
         for epoch in range(epochs):
-            loss = Classifier.sample_elbo(x_train, y_train, 10)
+            loss = Classifier.sample_elbo(x_train, y_train, opt.samples)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
