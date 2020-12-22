@@ -23,7 +23,7 @@ from torch.distributions import Normal
 
 
 class FC(nn.Module):
-    def __init__(self, input_features, hidden_units, output_features, noise_tol=.1,  prior_var=1.):
+    def __init__(self, input_features, hidden_units, output_features):
 
         super().__init__()
         self.hidden = nn.Linear(input_features,hidden_units)

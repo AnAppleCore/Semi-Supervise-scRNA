@@ -77,5 +77,5 @@ evaluate <- function(TrueLabelsPath, PredLabelsPath, Indices = NULL){
 }
 
 
-result <- evaluate('./Results/Pancreatic_data/Baron Human/FC/FC_True_Labels.csv', './Results/Pancreatic_data/Baron Human/FC/FC_Pred_Labels.csv')
-write.csv(result,file="./Results/Pancreatic_data/Baron Human/FC/FC.csv")
+result <- evaluate('./Results/Pancreatic_data/Baron Human/BNN/BNN_True_Labels.csv', './Results/Pancreatic_data/Baron Human/BNN/BNN_Pred_Labels.csv')
+write.csv(result,file="./Results/Pancreatic_data/Baron Human/BNN/BNN.csv")
