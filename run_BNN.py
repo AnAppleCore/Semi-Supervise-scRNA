@@ -4,7 +4,7 @@ parser = argparse.ArgumentParser()
 # choose the GPU id (0,1,2,3)
 parser.add_argument('-d', '--device_index', type = str, default = '1')
 parser.add_argument('-p', '--prior_var', type = float, default = 1.)
-parser.add_argument('-s', '--samples', type = int, default = 10)
+parser.add_argument('-s', '--samples', type = int, default = 1)
 parser.add_argument('-r', '--learning_rate', type = float, default = 1e-3)
 opt = parser.parse_args()
 
